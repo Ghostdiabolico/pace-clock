@@ -6,7 +6,11 @@
     <title>Pace Clock - Nuoto</title>
     <link href="https://fonts.googleapis.com/css2?family=Teko:wght@600;700&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
         body {
             font-family: 'Rajdhani', sans-serif;
@@ -20,90 +24,130 @@
         }
 
         .container {
-            width: 100%; height: 100%;
-            display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
-            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: row; /* Layout orizzontale per mettere il tasto a sinistra */
+            align-items: center;
+            justify-content: center;
+            gap: 30px;
+            padding: 20px;
         }
 
         .clock-container {
             position: relative;
-            width: min(90vh, 90vw);
-            height: min(90vh, 90vw);
-            display: flex; align-items: center; justify-content: center;
-            transition: all 0.5s ease;
+            width: min(92vh, 92vw); /* Massima dimensione possibile */
+            height: min(92vh, 92vw);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .clock-face {
-            position: relative; width: 100%; height: 100%;
+            position: relative;
+            width: 100%;
+            height: 100%;
             border-radius: 50%;
             background: radial-gradient(circle at 30% 30%, #2a3147, #151821);
             box-shadow: 0 0 60px rgba(0, 0, 0, 0.8), inset 0 0 80px rgba(0, 0, 0, 0.5);
             border: 8px solid #1a1f3a;
         }
 
-        .center-logo {
-            position: absolute; top: 50%; left: 50%;
+        .number {
+            position: absolute;
+            font-family: 'Teko', sans-serif;
+            font-size: 5.5vmin;
+            font-weight: 700;
+            color: #fff;
             transform: translate(-50%, -50%);
-            width: 30%; height: 30%; border-radius: 50%;
-            background: radial-gradient(circle, rgba(26, 31, 58, 0.95), rgba(21, 24, 33, 0.98));
-            display: flex; align-items: center; justify-content: center;
-            z-index: 5; border: 3px solid rgba(255, 255, 255, 0.1);
         }
 
-        .logo-preview { width: 100%; height: 100%; border-radius: 50%; object-fit: contain; padding: 15%; }
-        .number { position: absolute; font-family: 'Teko', sans-serif; font-size: 5vmin; font-weight: 700; color: #fff; transform: translate(-50%, -50%); }
-        .tick { position: absolute; width: 3px; height: 15px; background: rgba(255, 255, 255, 0.4); top: 4%; left: 50%; transform-origin: center 45vh; }
+        .tick {
+            position: absolute;
+            width: 3px;
+            height: 15px;
+            background: rgba(255, 255, 255, 0.4);
+            top: 4%;
+            left: 50%;
+            transform-origin: center 46vh; /* Questo valore si adatta alla dimensione */
+        }
+
         .tick.major { height: 25px; width: 4px; background: rgba(255, 255, 255, 0.6); }
 
-        .hand { position: absolute; bottom: 50%; left: 50%; transform-origin: bottom center; border-radius: 10px; }
-        .hand-black { width: 8px; height: 42%; background: linear-gradient(to top, #00a8ff, #5bc8ff); margin-left: -4px; z-index: 2; }
-        .hand-red { width: 10px; height: 45%; background: linear-gradient(to top, #ff3b30, #ff6b5e); margin-left: -5px; z-index: 3; }
-        .center-dot { position: absolute; top: 50%; left: 50%; width: 24px; height: 24px; background: #ff3b30; border-radius: 50%; transform: translate(-50%, -50%); z-index: 6; }
-
-        .controls { position: absolute; bottom: 5vh; display: flex; gap: 20px; z-index: 10; }
-        button { font-family: 'Rajdhani', sans-serif; padding: 15px 30px; font-size: 18px; font-weight: 700; border: none; border-radius: 12px; cursor: pointer; text-transform: uppercase; }
-        .reset-btn { background: #ff3b30; color: white; }
-        .fullscreen-btn { background: #3a4157; color: white; }
-        .logo-upload { position: absolute; top: 3vh; right: 3vh; z-index: 10; }
-        .upload-label { padding: 10px 20px; background: #2a3147; color: white; border-radius: 8px; cursor: pointer; }
-        #logoInput { display: none; }
-        .info-text { position: absolute; top: 3vh; left: 3vh; color: rgba(255,255,255,0.5); font-weight: 700; }
-
-        /* --- MODALITÀ TRAINING (FINTO FULLSCREEN) --- */
-        body.training-mode .controls, 
-        body.training-mode .logo-upload, 
-        body.training-mode .info-text {
-            display: none !important;
+        .hand {
+            position: absolute;
+            bottom: 50%;
+            left: 50%;
+            transform-origin: bottom center;
+            border-radius: 10px;
         }
-        body.training-mode .clock-container {
-            width: 98vw;
-            height: 98vh;
+
+        .hand-black {
+            width: 8px;
+            height: 42%;
+            background: linear-gradient(to top, #00a8ff, #5bc8ff);
+            margin-left: -4px;
+            z-index: 2;
+        }
+
+        .hand-red {
+            width: 10px;
+            height: 45%;
+            background: linear-gradient(to top, #ff3b30, #ff6b5e);
+            margin-left: -5px;
+            z-index: 3;
+        }
+
+        .center-dot {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 24px;
+            height: 24px;
+            background: #ff3b30;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 6;
+        }
+
+        /* Tasto Reset a sinistra */
+        .reset-btn {
+            background: linear-gradient(135deg, #ff3b30, #ff6b5e);
+            color: white;
+            border: none;
+            padding: 20px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 700;
+            font-size: 18px;
+            text-transform: uppercase;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+            writing-mode: vertical-lr; /* Opzionale: rende il tasto verticale se lo spazio è poco */
+            text-orientation: upright;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-upload, .info-text { display: none; } /* Nascondiamo il superfluo per Vivi */
+
+        @media (max-width: 600px) {
+            .container { flex-direction: column; }
+            .reset-btn { writing-mode: horizontal-tb; padding: 10px 20px; }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="info-text">PACE CLOCK</div>
+        <button class="reset-btn" id="resetBtn">R E S E T</button>
         
-        <div class="logo-upload">
-            <label for="logoInput" class="upload-label">📷 Logo</label>
-            <input type="file" id="logoInput" accept="image/*">
-            <button id="removeLogo" style="display:none; padding: 10px; margin-left: 5px;">🗑️</button>
-        </div>
-
         <div class="clock-container">
             <div class="clock-face" id="clockFace">
                 <div class="hand hand-black" id="blackHand"></div>
                 <div class="hand hand-red" id="redHand"></div>
-                <div class="center-logo"><img id="logoPreview" class="logo-preview" style="display:none;"></div>
                 <div class="center-dot"></div>
             </div>
-        </div>
-
-        <div class="controls">
-            <button class="reset-btn" id="resetBtn">🔄 Reset</button>
-            <button class="fullscreen-btn" id="fullscreenBtn">⛶ Training Mode</button>
         </div>
     </div>
 
@@ -114,7 +158,6 @@
         const redHand = document.getElementById('redHand');
         const blackHand = document.getElementById('blackHand');
         const resetBtn = document.getElementById('resetBtn');
-        const fullscreenBtn = document.getElementById('fullscreenBtn');
 
         // Genera Quadrante
         for (let i = 0; i < 60; i++) {
@@ -122,57 +165,36 @@
             tick.className = i % 5 === 0 ? 'tick major' : 'tick';
             tick.style.transform = `rotate(${i * 6}deg)`;
             clockFace.appendChild(tick);
+
             if (i % 5 === 0) {
-                const num = document.createElement('div');
-                num.className = 'number';
-                num.textContent = i;
+                const number = document.createElement('div');
+                number.className = 'number';
+                number.textContent = i;
                 const angle = (i * 6 - 90) * (Math.PI / 180);
-                num.style.left = (50 + 40 * Math.cos(angle)) + '%';
-                num.style.top = (50 + 40 * Math.sin(angle)) + '%';
-                clockFace.appendChild(num);
+                number.style.left = (50 + 40 * Math.cos(angle)) + '%';
+                number.style.top = (50 + 40 * Math.sin(angle)) + '%';
+                clockFace.appendChild(number);
             }
         }
 
         let startTime = Date.now();
 
         // Sync Reset
-        socket.on('receive_reset', (newTime) => { startTime = newTime; });
-        resetBtn.addEventListener('click', () => { socket.emit('send_reset'); });
-
-        // Sync Training Mode (Finto Fullscreen)
-        socket.on('receive_fullscreen', () => {
-            document.body.classList.toggle('training-mode');
+        socket.on('receive_reset', (newStartTime) => {
+            startTime = newStartTime;
         });
 
-        fullscreenBtn.addEventListener('click', () => {
-            socket.emit('send_fullscreen');
-            document.body.classList.toggle('training-mode');
+        resetBtn.addEventListener('click', () => {
+            socket.emit('send_reset');
         });
 
         function updateClock() {
-            const seconds = ((Date.now() - startTime) / 1000) % 60;
+            const elapsed = Date.now() - startTime;
+            const seconds = (elapsed / 1000) % 60;
             redHand.style.transform = `rotate(${seconds * 6}deg)`;
             blackHand.style.transform = `rotate(${((seconds + 30) % 60) * 6}deg)`;
             requestAnimationFrame(updateClock);
         }
-
-        // Gestione Logo LocalStorage
-        const logoInput = document.getElementById('logoInput');
-        const logoPreview = document.getElementById('logoPreview');
-        logoInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (ev) => {
-                    logoPreview.src = ev.target.result;
-                    logoPreview.style.display = 'block';
-                    localStorage.setItem('paceClockLogo', ev.target.result);
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-        const saved = localStorage.getItem('paceClockLogo');
-        if(saved) { logoPreview.src = saved; logoPreview.style.display = 'block'; }
 
         updateClock();
     </script>
