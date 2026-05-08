@@ -374,10 +374,11 @@
         </div>
     </div>
 
-    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+   <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+
 <script>
-    // 1. INSERISCI QUI IL TUO LINK DI RENDER
-    const RENDER_URL = https://pace-clock-server.onrender.com; 
+    // Configurazione connessione al tuo server su Render
+    const RENDER_URL = "https://pace-clock-server.onrender.com"; 
     const socket = io(RENDER_URL);
 
     const clockFace = document.getElementById('clockFace');
@@ -390,12 +391,13 @@
     const logoPlaceholder = document.getElementById('logoPlaceholder');
     const removeLogo = document.getElementById('removeLogo');
 
-    // Generazione numeri e ticks (Tuo codice originale)
+    // Generazione numeri e ticks
     for (let i = 0; i < 60; i++) {
         const tick = document.createElement('div');
         tick.className = i % 5 === 0 ? 'tick major' : 'tick';
         tick.style.transform = `rotate(${i * 6}deg)`;
         clockFace.appendChild(tick);
+
         if (i % 5 === 0) {
             const number = document.createElement('div');
             number.className = 'number';
@@ -412,26 +414,72 @@
 
     let startTime = Date.now();
 
-    // Sincronizzazione via Socket
+    // --- LOGICA DI SINCRONIZZAZIONE ---
+    
+    // Quando il server invia un reset, tutti gli orologi lo ricevono qui
     socket.on('receive_reset', (newStartTime) => {
+        console.log("Sincronizzazione ricevuta!");
         startTime = newStartTime;
     });
 
     function updateClock() {
         const elapsed = Date.now() - startTime;
         const seconds = (elapsed / 1000) % 60;
+        
         redHand.style.transform = `rotate(${seconds * 6}deg)`;
         blackHand.style.transform = `rotate(${((seconds + 30) % 60) * 6}deg)`;
+        
         requestAnimationFrame(updateClock);
     }
 
-    // Tasto Reset: ora invia il segnale al server
+    // Il tasto Reset ora "chiama" il server invece di resettare solo localmente
     resetBtn.addEventListener('click', () => {
         socket.emit('send_reset');
     });
 
-    // Mantieni qui le tue funzioni Fullscreen e Logo (non cambiano)
-    // ... [Inserisci qui le funzioni fullscreenBtn.addEventListener e logoInput.addEventListener del tuo file originale] ...
+    // --- ALTRE FUNZIONI (Fullscreen e Logo) ---
+
+    fullscreenBtn.addEventListener('click', () => {
+        const elem = document.documentElement;
+        if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+            if (elem.requestFullscreen) elem.requestFullscreen();
+            else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
+        } else {
+            if (document.exitFullscreen) document.exitFullscreen();
+            else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+        }
+    });
+
+    logoInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                logoPreview.src = event.target.result;
+                logoPreview.style.display = 'block';
+                logoPlaceholder.style.display = 'none';
+                removeLogo.style.display = 'inline-block';
+                localStorage.setItem('paceClockLogo', event.target.result);
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    removeLogo.addEventListener('click', () => {
+        logoPreview.src = '';
+        logoPreview.style.display = 'none';
+        logoPlaceholder.style.display = 'block';
+        removeLogo.style.display = 'none';
+        localStorage.removeItem('paceClockLogo');
+    });
+
+    const savedLogo = localStorage.getItem('paceClockLogo');
+    if (savedLogo) {
+        logoPreview.src = savedLogo;
+        logoPreview.style.display = 'block';
+        logoPlaceholder.style.display = 'none';
+        removeLogo.style.display = 'inline-block';
+    }
 
     updateClock();
 </script>
