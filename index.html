@@ -335,6 +335,15 @@
             position: absolute;
             right: 3vw;
         }
+
+        /* Classe per nascondere i controlli e ingrandire l'orologio */
+.training-mode .controls, .training-mode .logo-upload, .training-mode .info-text {
+    display: none !important;
+}
+.training-mode .clock-container {
+    width: 98vw;
+    height: 98vh;
+}
     </style>
 </head>
 <body>
@@ -439,17 +448,17 @@
 
     // --- ALTRE FUNZIONI (Fullscreen e Logo) ---
 
-// Questa funzione esegue l'azione fisica del fullscreen
-    function toggleLocalFullscreen() {
-        const elem = document.documentElement;
-        if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-            if (elem.requestFullscreen) elem.requestFullscreen();
-            else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
-        } else {
-            if (document.exitFullscreen) document.exitFullscreen();
-            else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
-        }
-    }
+socket.on('receive_fullscreen', () => {
+    // Invece del fullscreen reale, attiviamo la classe CSS
+    document.body.classList.toggle('training-mode');
+    console.log("Modalità Training attivata/disattivata");
+});
+
+fullscreenBtn.addEventListener('click', () => {
+    socket.emit('send_fullscreen');
+    document.body.classList.toggle('training-mode');
+});
+  
 
     // Quando clicchi sul pulsante (es. dal tuo telefono)
     fullscreenBtn.addEventListener('click', () => {
