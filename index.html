@@ -439,7 +439,8 @@
 
     // --- ALTRE FUNZIONI (Fullscreen e Logo) ---
 
-    fullscreenBtn.addEventListener('click', () => {
+// Questa funzione esegue l'azione fisica del fullscreen
+    function toggleLocalFullscreen() {
         const elem = document.documentElement;
         if (!document.fullscreenElement && !document.webkitFullscreenElement) {
             if (elem.requestFullscreen) elem.requestFullscreen();
@@ -448,6 +449,20 @@
             if (document.exitFullscreen) document.exitFullscreen();
             else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
         }
+    }
+
+    // Quando clicchi sul pulsante (es. dal tuo telefono)
+    fullscreenBtn.addEventListener('click', () => {
+        // 1. Invia il segnale a tutti gli altri dispositivi tramite Render
+        socket.emit('send_fullscreen');
+        // 2. Fallo anche sul dispositivo che stai usando
+        toggleLocalFullscreen();
+    });
+
+    // Quando questo dispositivo riceve il segnale "receive_fullscreen" dal server
+    socket.on('receive_fullscreen', () => {
+        console.log("Comando fullscreen ricevuto dal server");
+        toggleLocalFullscreen();
     });
 
     logoInput.addEventListener('change', (e) => {
