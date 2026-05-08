@@ -27,16 +27,15 @@
             width: 100%;
             height: 100%;
             display: flex;
-            flex-direction: row; /* Layout orizzontale per mettere il tasto a sinistra */
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 30px;
-            padding: 20px;
+            position: relative;
         }
 
         .clock-container {
             position: relative;
-            width: min(92vh, 92vw); /* Massima dimensione possibile */
+            width: min(92vh, 92vw);
             height: min(92vh, 92vw);
             display: flex;
             align-items: center;
@@ -69,7 +68,7 @@
             background: rgba(255, 255, 255, 0.4);
             top: 4%;
             left: 50%;
-            transform-origin: center 46vh; /* Questo valore si adatta alla dimensione */
+            transform-origin: center 46vh;
         }
 
         .tick.major { height: 25px; width: 4px; background: rgba(255, 255, 255, 0.6); }
@@ -110,38 +109,36 @@
             z-index: 6;
         }
 
-        /* Tasto Reset a sinistra */
+        /* --- NUOVO POSIZIONAMENTO TASTO RESET --- */
         .reset-btn {
+            position: absolute;
+            bottom: 30px; /* Distanza dal fondo */
+            right: 40px;  /* Spostato a destra */
             background: linear-gradient(135deg, #ff3b30, #ff6b5e);
             color: white;
             border: none;
-            padding: 20px;
-            border-radius: 15px;
+            padding: 10px 25px; /* Più piccolo */
+            border-radius: 8px;
             cursor: pointer;
             font-family: 'Rajdhani', sans-serif;
             font-weight: 700;
-            font-size: 18px;
+            font-size: 14px; /* Testo più piccolo */
             text-transform: uppercase;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
-            writing-mode: vertical-lr; /* Opzionale: rende il tasto verticale se lo spazio è poco */
-            text-orientation: upright;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            z-index: 20;
+            transition: transform 0.2s;
         }
 
-        .logo-upload, .info-text { display: none; } /* Nascondiamo il superfluo per Vivi */
-
-        @media (max-width: 600px) {
-            .container { flex-direction: column; }
-            .reset-btn { writing-mode: horizontal-tb; padding: 10px 20px; }
+        .reset-btn:active {
+            transform: scale(0.95);
         }
+
+        .logo-upload, .info-text { display: none; }
     </style>
 </head>
 <body>
     <div class="container">
-        <button class="reset-btn" id="resetBtn">R E S E T</button>
-        
         <div class="clock-container">
             <div class="clock-face" id="clockFace">
                 <div class="hand hand-black" id="blackHand"></div>
@@ -149,17 +146,20 @@
                 <div class="center-dot"></div>
             </div>
         </div>
+
+        <button class="reset-btn" id="resetBtn">RESET</button>
     </div>
 
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
     <script>
+        // Connessione al server Render
         const socket = io("https://pace-clock-server.onrender.com");
         const clockFace = document.getElementById('clockFace');
         const redHand = document.getElementById('redHand');
         const blackHand = document.getElementById('blackHand');
         const resetBtn = document.getElementById('resetBtn');
 
-        // Genera Quadrante
+        // Generazione quadrante
         for (let i = 0; i < 60; i++) {
             const tick = document.createElement('div');
             tick.className = i % 5 === 0 ? 'tick major' : 'tick';
@@ -179,11 +179,12 @@
 
         let startTime = Date.now();
 
-        // Sync Reset
+        // Ascolto comando Reset dal server
         socket.on('receive_reset', (newStartTime) => {
             startTime = newStartTime;
         });
 
+        // Invio comando Reset al server
         resetBtn.addEventListener('click', () => {
             socket.emit('send_reset');
         });
